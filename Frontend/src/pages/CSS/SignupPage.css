@@ -1,0 +1,172 @@
+/* General Page Layout */
+.signup-page {
+    display: flex;
+    height: 104vh;
+    width: 75%;
+    font-family: Arial, sans-serif;
+    margin: auto;
+    margin-top: 1rem;
+}
+
+.signup-left {
+    flex: 1.3;
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup-image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
+.signup-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
+}
+
+.signup-container {
+    width: 90%;
+    max-width: 400px;
+    padding: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    /* margin-top: 15rem; */
+    background: #fff;
+}
+
+.signup-container h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* Form Fields */
+.signup-fields input,
+.signup-select {
+    width: 100%;
+    padding: 0.6rem;
+    margin: 0.3rem 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.signup-select {
+    background-color: #fff;
+}
+
+/* Address Section Styling */
+.address-section {
+    margin-top: 1rem;
+    border-top: 1px solid #ccc;
+    padding-top: 1rem;
+}
+
+.address-section h2 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #444;
+}
+
+.address-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.address-fields input {
+    flex: 1 1 calc(50% - 1rem);
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.address-fields input.full-width {
+    flex: 1 1 100%;
+}
+
+/* Button */
+.signup-button {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #4caf50;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.signup-button:hover {
+    background-color: #45a049;
+}
+
+/* Checkbox */
+.signup-agree {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.signup-agree input {
+    margin-right: 0.5rem;
+}
+
+/* Login Redirect */
+.signup-login {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.signup-login span {
+    color: #007bff;
+    cursor: pointer;
+}
+
+.signup-login span:hover {
+    text-decoration: underline;
+}
+
+.success-message {
+    color: green;
+    font-size: 1.2rem;
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .signup-page {
+        flex-direction: column;
+        height: auto;
+        width: 90%;
+    }
+
+    .signup-left {
+        flex: none;
+        height: 200px;
+    }
+
+    .signup-right {
+        flex: none;
+        width: 100%;
+    }
+
+    .signup-container {
+        width: 100%;
+    }
+}

@@ -1,0 +1,84 @@
+.item {
+    width: 350px;
+}
+
+.item p {
+    margin: 6px 0px;
+}
+
+.item-prices {
+    display: flex;
+    gap: 20px;
+}
+
+.item-price-new {
+    color: #374151;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.item-price-old {
+    color: #8c8c8c;
+    font-size: 18px;
+    font-weight: 500;
+    text-decoration: line-through;
+}
+
+.item:hover {
+    transform: scale(1.05);
+    transition: 0.6s;
+}
+
+.item-status {
+    height: 60px;
+    width: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.item-status img {
+    width: 30px;
+    height: 30px;
+}
+
+.item-add-to-cart {
+    display: flex;
+    gap: 10px;
+}
+
+.item-add-to-wishlist {
+    display: flex;
+    gap: 10px;
+}
+
+.wishlist_icon {
+    border-radius: 50%; /* Keeps the icon circular */
+    width: 30px; /* Final size of the icon */
+    height: 30px; /* Final size of the icon */
+    background-color: transparent; /* Default background */
+    background-clip: content-box; /* Ensures the background color applies only inside the padding box */
+    transition: background-color 0.3s ease; /* Smooth transition for background-color */
+}
+
+
+.item img {
+    width: 100%;
+    /* Adjust to fit the container */
+    height: auto;
+    /* Maintain aspect ratio */
+    object-fit: cover;
+    /* Crop the image to fit the container if needed */
+    border-radius: 8px;
+    /* Optional: Adds rounded corners */
+    transition: transform 0.3s ease;
+    /* Adds a smooth hover effect */
+}
+
+.item-wishlist{
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
