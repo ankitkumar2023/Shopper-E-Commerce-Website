@@ -219,6 +219,7 @@ const ShopContextProvider = (props) => {
       setCartItems(data.Cart);
       localStorage.setItem("cartItems", JSON.stringify(data.Cart));
       alert("Item added to cart!");
+      setProductSize({});
     } catch (error) {
       console.error("Error while adding item to cart:", error.message);
     }
@@ -331,3 +332,4 @@ const ShopContextProvider = (props) => {
 };
 
 export default ShopContextProvider;
+

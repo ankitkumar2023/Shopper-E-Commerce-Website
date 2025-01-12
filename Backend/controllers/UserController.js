@@ -88,10 +88,10 @@ const signupDetails = async (req, res) => {
 
 const userChecker= async (req, res) => {
 
-    const { UserId } = req.query;
-    console.log(UserId);
+    const { Email } = req.query;
+    console.log(Email);
     try {
-        let response = await User.findOne({_id:UserId});
+        let response = await User.findOne({Email:Email});
         res.status(200).json(response);
 
     } catch (error) {

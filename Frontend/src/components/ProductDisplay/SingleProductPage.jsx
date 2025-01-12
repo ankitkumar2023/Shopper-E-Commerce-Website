@@ -11,7 +11,7 @@ const ProductDisplay = (props) => {
   const { addToCart, UserId, wishlistItems, handleWishlist, productSize, handleProductSize, Quantity } = useContext(ShopContext);
   const navigate = useNavigate();
 
-  const checker = (ProductId, selectedSize) => {
+  const checker = (UserId,ProductId, selectedSize,Quantity) => {
     console.log("product id in single product page", ProductId);
     // Check if user is logged in
     if (UserId) {
@@ -24,7 +24,8 @@ const ProductDisplay = (props) => {
   };
 
   const sizes = ["S", "M", "L", "XL", "XXL"];
-  const selectedSize = productSize[product._id] || "";  // Get the selected size for this product
+  const selectedSize = productSize[product._id] || "";// Get the selected size for this product
+  console.log("selected size in single product page",selectedSize)
 
   const isInWishlist = wishlistItems.includes(product._id);
 
@@ -74,7 +75,7 @@ const ProductDisplay = (props) => {
 
         <div className="option-buttons">
           <Link to="/cart">
-            <div className="add-to-cart" onClick={() => checker(UserId,product._id, selectedSize)}>
+            <div className="add-to-cart" onClick={() => checker(UserId,product._id, selectedSize,Quantity)}>
               <p>Add To Cart</p>
             </div>
           </Link>
