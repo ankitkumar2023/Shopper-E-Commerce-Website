@@ -17,7 +17,7 @@ const SignupPage = () => {
     Locality: "",
     House_Number: "",
   });
-  const [message, setMessage] = useState(""); // Message from the backend
+  const [Message, setMessage] = useState(""); // Message from the backend
   const [isSuccess, setIsSuccess] = useState(false); // Success state for styling
 
   const { SignupAuthentication, isUserDetailSaved, setIsUserDetailSaved } =
@@ -50,7 +50,7 @@ const SignupPage = () => {
         Address
       );
       setMessage(response.message); // Set message from backend
-      setIsSuccess(response.ok); // Set success state
+      setIsSuccess(response.data.ok); // Set success state
     } else {
       setMessage("Please fill up all required credentials.");
       setIsSuccess(false);
@@ -77,13 +77,13 @@ const SignupPage = () => {
       <div className="signup-right">
         <div className="signup-container">
           <h1>Sign Up</h1>
-          {message && (
+          {Message && (
             <div
               className={`message ${
                 isSuccess ? "success-message" : "error-message"
               }`}
             >
-              <p>{message}</p>
+              <p>{Message}</p>
             </div>
           )}
           {!isUserDetailSaved && (

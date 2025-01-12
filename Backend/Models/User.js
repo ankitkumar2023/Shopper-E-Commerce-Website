@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema({
         },
         Size: {
             type: String,
-            enum: ["S", "M", "L", "Xl", "XXL"],
+            enum: ["S", "M", "L", "XL", "XXL"],
             required:true,
         },
         Quantity: {

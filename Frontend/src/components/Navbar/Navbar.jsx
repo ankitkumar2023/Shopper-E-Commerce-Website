@@ -15,7 +15,8 @@ function Navbar() {
     setSearchkeyWord, 
     userShortName, 
     isUserDetailSaved, 
-    isUserAlreadyExist 
+    isUserAlreadyExist,
+    userInfo
   } = useContext(ShopContext);
 
   const handleSearch = () => {

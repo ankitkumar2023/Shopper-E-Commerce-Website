@@ -1,125 +1,102 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import "./ProductDisplay.css";
 import star_icon from "../Assets/star_icon.png";
 import star_dull_icon from "../Assets/star_dull_icon.png";
+import wishlist_icon from "../Assets/wishlist.png";
 import { ShopContext } from "../../Context/ShopContext";
 import { Link, useNavigate } from "react-router-dom";
-import wishlist_icon from '../Assets/wishlist.png'
 
 const ProductDisplay = (props) => {
-  const { product,ProductId } = props;
-  const { addToCart, userInfo, wishlistItems,handleWishlist,productSize,handleProductSize } = useContext(ShopContext);
-  
-    
-    const navigate = useNavigate();
+  const { product } = props;
+  const { addToCart, UserId, wishlistItems, handleWishlist, productSize, handleProductSize, Quantity } = useContext(ShopContext);
+  const navigate = useNavigate();
 
-  const checker = (ProductId) => {
-    if (userInfo) {
-        const UserId=userInfo._id
-        addToCart(ProductId,UserId,productSize)
-      } else {
-          navigate("/login")
+  const checker = (ProductId, selectedSize) => {
+    console.log("product id in single product page", ProductId);
+    // Check if user is logged in
+    if (UserId) {
+      console.log("user id :-", UserId, "Product id :-", ProductId, "product size selected:-", selectedSize, "quantity:-", Quantity);
+      // Pass selected size and quantity to the addToCart function
+      addToCart(UserId, ProductId, selectedSize, Quantity);
+    } else {
+      navigate("/login");
     }
   };
 
-
-
-  
-  const isInWishlist = wishlistItems.includes(product.id)
-
   const sizes = ["S", "M", "L", "XL", "XXL"];
+  const selectedSize = productSize[product._id] || "";  // Get the selected size for this product
 
-  const selectedSize = productSize[product.id] || [];  //array of product sizes
-  console.log(selectedSize)
-
-  
+  const isInWishlist = wishlistItems.includes(product._id);
 
   return (
-    <>
-      <div className="productdisplay">
-        <div className="productdisplay-left">
-          <div className="productdisplay-img-list">
-            <img src={product.Image1} alt="" />
-            <img src={product.Image2} alt="" />
-            <img src={product.Image1} alt="" />
-            <img src={product.Image2} alt="" />
+    <div className="productdisplay">
+      <div className="productdisplay-left">
+        <div className="productdisplay-img-list">
+          <img src={product.Image1} alt="Product" />
+          <img src={product.Image2} alt="Product" />
+        </div>
+        <div className="productdisplay-img">
+          <img className="productdisplay-main-img" src={product.Image1} alt="Product" />
+        </div>
+      </div>
+
+      <div className="productdisplay-right">
+        <h1>{product.name}</h1>
+        <div className="productdisplay-right-stars">
+          {[...Array(4)].map((_, i) => (
+            <img key={i} src={star_icon} alt="Star" />
+          ))}
+          <img src={star_dull_icon} alt="Star Dull" />
+          <p>(122)</p>
+        </div>
+
+        <div className="productdisplay-right-prices">
+          <div className="productdisplay-right-price-old">${product.Price}</div>
+          <div className="productdisplay-right-price-new">${product.Offer_Price}</div>
+        </div>
+
+        <div className="productdisplay-right-description">{product.Description}</div>
+
+        <div className="productdisplay-right-size">
+          <h1>Select Size</h1>
+          <div className="productdisplay-right-sizes">
+            {sizes.map((size) => (
+              <div
+                key={size}
+                onClick={() => handleProductSize(product._id, size)}  // Update size in context
+                className={`size-option ${selectedSize === size ? "selected" : ""}`}
+              >
+                {size}
+              </div>
+            ))}
           </div>
-          <div className="productdisplay-img">
+        </div>
+
+        <div className="option-buttons">
+          <Link to="/cart">
+            <div className="add-to-cart" onClick={() => checker(UserId,product._id, selectedSize)}>
+              <p>Add To Cart</p>
+            </div>
+          </Link>
+          <div className="wishlist" onClick={() => handleWishlist(product._id)}>
+            <p>Add To Wishlist</p>
             <img
-              className="productdisplay-main-img"
-              src={product.Image1}
-              alt=""
+              className="wishlist_icon"
+              style={{ backgroundColor: isInWishlist ? "red" : "white" }}
+              src={wishlist_icon}
+              alt="Wishlist"
             />
           </div>
         </div>
-        <div className="productdisplay-right">
-          <h1>{product.name}</h1>
-          <div className="productdisplay-right-stars">
-            <img src={star_icon} alt="" />
-            <img src={star_icon} alt="" />
-            <img src={star_icon} alt="" />
-            <img src={star_icon} alt="" />
-            <img src={star_dull_icon} alt="" />
-            <p>(122)</p>
-          </div>
-          <div className="productdisplay-right-prices">
-            <div className="productdisplay-right-price-old">
-              ${product.Price}
-            </div>
-            <div className="productdisplay-right-price-new">
-              ${product.Offer_Price}
-            </div>
-          </div>
-          <div className="productdisplay-right-description">
-            {product.Description}
-          </div>
-          <div className="productdisplay-right-size">
-            <h1>Select Size</h1>
-            <div className="productdisplay-right-sizes">
-              {
-                sizes.map((size) => (
-                  <div
-                    key={size}
-                    
-                    onClick={() => handleProductSize(product.id, size)}  
-                    className={`size-option ${selectedSize.includes(size) ? "selected" : ""}`}
-                  >
-                    {size}
-                  </div>
-                ))
-             }
-            </div>
-          </div>
-          <div className="option-buttons">
-            
 
-            <Link to="/cart"><div
-              className="add-to-cart"
-            onClick={() => {
-              checker(product._id);
-            }}
-          >
-              <p>Add To cart</p>
-              <img src="" alt="" />
-              </div></Link>
-            
-            <div className="wishlist"
-              onClick={()=>{handleWishlist(product._id)}}
-            >
-              <p>Add To Wishlist</p>
-              <img  className="wishlist_icon"  style={{background : isInWishlist?"red":"white"}} src={wishlist_icon} alt="" />
-              </div>
-              
-            </div>
-          <p className="productdisplay-right-category">
-            <span>Category :</span>Women , T-Shirt, Crop-Top
-          </p>
-          <p className="productdisplay-right-category">
-            <span>Tags :</span>Modern , LAtest
-          </p>
-        </div>
+        <p className="productdisplay-right-category">
+          <span>Category :</span> Women, T-Shirt, Crop-Top
+        </p>
+        <p className="productdisplay-right-category">
+          <span>Tags :</span> Modern, Latest
+        </p>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -65,7 +65,8 @@ router.post('/fetch-and-store', async (req, res) => {
     }
 });
 
-router.get("",FilterProducts)
+router.get("", FilterProducts)
+router.get("/allproduct",getAllProducts)
 router.get('/', getProductDetails);
 router.post('/updateproduct', updateProductDetails);
 

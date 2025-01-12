@@ -2,6 +2,7 @@ import React from 'react'
 import CartItems from '../components/Cartitems/CartItems'
 
 function Cart() {
+  
   return (
     <>
       <div>

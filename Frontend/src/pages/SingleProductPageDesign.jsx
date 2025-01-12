@@ -22,7 +22,7 @@ function Product() {
     <>
       <div>
         <Breadcrum product={product} />
-        <ProductDisplay product={product} ProductId={productId} />
+        <ProductDisplay product={product} ProductId ={productId} />
         <DescriptionBox />
         <RelatedProducts />
       </div>

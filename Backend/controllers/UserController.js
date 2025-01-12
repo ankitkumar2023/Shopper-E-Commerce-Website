@@ -28,54 +28,70 @@ const updateUserDetails =  async (req, res) => {
 }
 
 const signupDetails = async (req, res) => {
-    try {
-      const {
-        FirstName,
-        LastName,
-        Gender,
-        Mobile,
-        Email,
-        Password,
-        Address: { Pincode, State, City, Locality, House_Number } = {},
-      } = req.body;
-  
-      // Ensure required fields are present
-      if (!FirstName || !LastName || !Email || !Password || !Pincode || !State || !City) {
-        return res.status(400).json({ok:false, message: "Missing required fields" });
-      }
-  
-      const newUser = new User({
-        FirstName,
-        LastName,
-        Gender,
-        Email,
-        Password,
-        Mobile,
-        Address: {
-          Pincode,
-          State,
-          City,
-          Locality,
-          House_Number,
-        },
-      });
-  
-      const response = await newUser.save();
-      res.status(200).json({ ok:true,message: "Successfully saved the user data", response });
-      console.log("User data saved successfully");
-    } catch (error) {
-      console.error("Error while saving the data", error);
-      res.status(500).json({ok:false, message: "Internal Server Error", error });
+  try {
+    const {
+      FirstName,
+      LastName,
+      Gender,
+      Mobile,
+      Email,
+      Password,
+      Address: { Pincode, State, City, Locality, House_Number } = {},
+    } = req.body;
+
+    // Check if the user already exists
+    const isUserExist = await User.findOne({ Email });
+    if (isUserExist) {
+      return res.status(400).json({ ok: false, message: "User already exists" });
     }
-  };
+
+    // Ensure required fields are present
+    if (!FirstName || !LastName || !Email || !Password || !Pincode || !State || !City) {
+      return res.status(400).json({ ok: false, message: "Missing required fields" });
+    }
+
+    // Directly store the plain text password (NOT RECOMMENDED for production)
+    const newUser = new User({
+      FirstName,
+      LastName,
+      Gender,
+      Mobile,
+      Email,
+      Password, // Storing plain text password
+      Address: {
+        Pincode,
+        State,
+        City,
+        Locality,
+        House_Number,
+      },
+    });
+
+    // Save the user to the database
+    const savedUser = await newUser.save();
+
+    // Send a success response with the user data
+    res.status(201).json({
+      ok: true,
+      message: "User signed up successfully",
+      response: savedUser,
+    });
+  } catch (error) {
+    console.error("Error during signup:", error.message);
+    res.status(500).json({ ok: false, message: "Internal server error" });
+  }
+};
+
+  
   
 
 
 const userChecker= async (req, res) => {
 
-    const { Email } = req.query;
+    const { UserId } = req.query;
+    console.log(UserId);
     try {
-        let response = await User.findOne({Email});
+        let response = await User.findOne({_id:UserId});
         res.status(200).json(response);
 
     } catch (error) {
@@ -117,30 +133,109 @@ const DeleteUser = async (req, res) => {
 }
 
 const addToCart = async (req, res) => {
-    try {
-        const { UserId } = req.query;
-        console.log(UserId)
-        const { ProductId, Size, Quantity } = req.body;
-    
-        const userDetails = await User.findOne({ _id: UserId });
-        console.log(userDetails);
+  try {
+    const { UserId } = req.query;
+    const { ProductId, Size, Quantity } = req.body;
 
-        if (!userDetails) {
-            return res.status(404).json({ message: "UserNot Found" });
-        }
-
-        userDetails.Cart.push({ProductId,  Size, Quantity });
-
-        if (userDetails.Cart.length == 0) {
-            return res.status(404).json({ message: "can't able to add product to cart" });
-        }
-        res.status(201).json({ message: "Item successfully added to cart",userDetails })
-    } catch (error) {
-        console.log("Error while adding item to cart", error);
-        res.status(500).json({ message: "Internal Server Error" });
+    if (!UserId || !ProductId || !Size || !Quantity) {
+      return res.status(400).json({ message: "Invalid request data" });
     }
-    
-}
+
+    const userDetails = await User.findOne({ _id: UserId });
+
+    if (!userDetails) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const existingCartItem = userDetails.Cart.find(
+      (item) =>
+        item.ProductId.toString() === ProductId.toString() &&
+        item.Size.trim().toLowerCase() === Size.trim().toLowerCase()
+    );
+
+    if (existingCartItem) {
+      existingCartItem.Quantity += Number(Quantity);
+    } else {
+      userDetails.Cart.push({ ProductId, Size, Quantity });
+    }
+
+    await userDetails.save();
+    res.status(201).json({ message: "Item successfully added to cart", Cart: userDetails.Cart });
+  } catch (error) {
+    console.error("Error while adding item to cart", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const RemoveFromCart = async (req, res) => {
+  try {
+    const { UserId } = req.query;
+    const { ProductId, Size } = req.body;
+
+    console.log("UserId :-",UserId,"ProductId :- ",ProductId,"Size :- ",Size)
+
+    if (!UserId || !ProductId || !Size ) {
+      return res.status(400).json({ message: "Invalid request data" });
+    }
+
+    const userDetails = await User.findOne({ _id: UserId });
+
+    if (!userDetails) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const existingCartItem = userDetails.Cart.find(
+      (item) =>
+        item.ProductId.toString() === ProductId.toString() &&
+        item.Size.trim().toLowerCase() === Size.trim().toLowerCase()
+    );
+
+    if (existingCartItem) {
+      
+      let updatedcartdata = userDetails.Cart.filter((item) => item.ProductId.toString() != existingCartItem.ProductId.toString() || item.Size.trim().toLowerCase() != existingCartItem.Size.trim().toLowerCase());
+      userDetails.Cart = updatedcartdata;
+       
+    }
+
+    await userDetails.save();
+    res.status(201).json({ok:true, message: "Item successfully remove  from cart", Cart: userDetails.Cart });
+  } catch (error) {
+    console.error("Error while deleting item from cart", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+  
+const updateCartQuantity = async (req, res) => {
+  try {
+     const { UserId } = req.query;
+      const {  ProductId, Size, Quantity } = req.body;
+  
+      const userDetails = await User.findOne({ _id: UserId });
+  
+      if (!userDetails) {
+        return res.status(404).json({ message: "User Not Found" });
+      }
+  
+      const cartItem = userDetails.Cart.find(
+        (item) => item.ProductId.toString()=== ProductId.toString() && item.Size.trim().toLowerCase() === Size.trim().toLowerCase
+      );
+  
+      if (cartItem) {
+        cartItem.Quantity = Quantity;
+        await userDetails.save();
+        res.status(200).json({ message: "Cart quantity updated",Cart: userDetails.Cart });
+      } else {
+        res.status(404).json({ message: "Item not found in cart" });
+      }
+    } catch (error) {
+      console.error("Error while updating cart quantity", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+  
+  
 
 
 const addToWishlist = async (req, res) => {
@@ -178,5 +273,5 @@ const addToWishlist = async (req, res) => {
    
 };
 
-const value = { updateUserDetails, signupDetails,userChecker,UserVerification ,DeleteUser,addToCart,addToWishlist};
+const value = { updateUserDetails, signupDetails,userChecker,UserVerification ,DeleteUser,addToCart,addToWishlist,RemoveFromCart,updateCartQuantity};
 export default value;

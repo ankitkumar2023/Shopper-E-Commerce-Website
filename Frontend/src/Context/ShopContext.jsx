@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from "react";
-import { json } from "react-router-dom";
 
 export const ShopContext = createContext(null);
 
@@ -18,7 +17,7 @@ const ShopContextProvider = (props) => {
   const [allBrandName, setAllBrandName] = useState([]);
   const [allProductColor, setAllProductColor] = useState([]);
   const [allDiscount, setAllDiscount] = useState([]);
-  const [cartItems, setCartItems] = useState({});
+  const [cartItems, setCartItems] = useState([]);
   const [UserDetails, setUserDetails] = useState(false);
   const [searchkeyword, setSearchkeyWord] = useState("");
   const [addItemToCArt, setAddItemToCart] = useState(false);
@@ -26,21 +25,45 @@ const ShopContextProvider = (props) => {
   const [wishlistStatus, setWishlistStatus] = useState(false);
   const [productSize, setProductSize] = useState({});
   const [isUserDetailSaved, setIsUserDetailSaved] = useState(false);
-  const [isUserAlreadyExist, setIsUserAlreadyExist] = useState(false)
-  const [userShortName, setUserShortName] = useState("")
-  const [userInfo, setUserInfo] = useState({})
-  const [userid, setUserId] = useState("")
-  
+  const [isUserAlreadyExist, setIsUserAlreadyExist] = useState(false);
+  const [userShortName, setUserShortName] = useState("");
+  const [userInfo, setUserInfo] = useState({});
+  const [UserId, setUserId] = useState("");
+  const [Quantity, setQuantity] = useState(1);
+  const [fetchAllProduct, setFetchAllProduct] = useState([]);
 
   useEffect(() => {
-    // Retrieve the persisted userShortName from localStorage
-    const storedShortName = localStorage.getItem("userShortName");
-    if (storedShortName) {
-      setUserShortName(storedShortName);
+    const storedUserShortName = JSON.parse(localStorage.getItem("userShortName"));
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
+    const storedUserInfo = JSON.parse(localStorage.getItem("UserDetail"));
+
+    if (storedUserShortName) {
+      setUserShortName(storedUserShortName);
       setIsUserAlreadyExist(true);
     }
+
+    if (storedCartItems) {
+      setCartItems(storedCartItems);
+    }
+
+    if (storedUserInfo) {
+      setUserInfo(storedUserInfo);
+    }
+
+    allproductfetcher();
   }, []);
-  
+
+  const allproductfetcher = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/product/allproduct`);
+      const data = await response.json();
+      if (response.ok) {
+        setFetchAllProduct(data.allProduct);
+      }
+    } catch (error) {
+      console.error("Error fetching all products:", error);
+    }
+  };
 
   const fetchData = async (Gender, filters = {}) => {
     try {
@@ -49,8 +72,7 @@ const ShopContextProvider = (props) => {
       if (!response.ok) {
         throw new Error("Failed to fetch products");
       }
-      const { filterData, allBrandName, allProductColor, allDiscount } =
-        await response.json();
+      const { filterData, allBrandName, allProductColor, allDiscount } = await response.json();
       setall_product(filterData);
       setAllBrandName(allBrandName);
       setAllProductColor(allProductColor);
@@ -59,7 +81,7 @@ const ShopContextProvider = (props) => {
       console.error("Error while fetching the data:", error);
     }
   };
-  
+
   const SignupAuthentication = async (
     FirstName,
     LastName,
@@ -87,10 +109,15 @@ const ShopContextProvider = (props) => {
       });
 
       const data = await response.json();
-      if (response.ok) {
+      if (data.ok) {
         setIsUserAlreadyExist(true);
         const shortName = (FirstName[0] + LastName[0]).toUpperCase();
-        setUserInfo({ ...data, shortName });
+        localStorage.setItem("userShortName", JSON.stringify(shortName));
+        localStorage.setItem("UserDetail", JSON.stringify(data.response));
+        localStorage.setItem("cartItems", JSON.stringify(data.response.Cart));
+        setUserShortName(shortName);
+        setUserInfo(data.savedUser);
+        setCartItems(data.response.Cart);
         alert("Signup successful!");
       } else {
         alert("Unable to save user data");
@@ -99,21 +126,17 @@ const ShopContextProvider = (props) => {
       console.error("Error while saving user data:", error.message);
     }
   };
-  
 
-  const userInfoFetcher = async(UserId) => {
+  const userInfoFetcher = async (UserId) => {
     try {
-      const user = await fetch(`http:localhost:3000/user/UserId=${UserId}`);
-      console.log(user)
-
+      const user = await fetch(`http://localhost:3000/user/UserId=${UserId}`);
       if (user) {
-        setUserInfo(user)
+        setUserInfo(user);
       }
-      
     } catch (error) {
-      console.log("error while fetching user data")
+      console.error("Error while fetching user data:", error);
     }
-  }
+  };
 
   const UserVerification = async (Username, Password) => {
     try {
@@ -121,29 +144,23 @@ const ShopContextProvider = (props) => {
         `http://localhost:3000/user/login?Email=${Username}&Password=${Password}`
       );
       const Data = await response.json();
-  
-      console.log(Data.user);
-      console.log("User ID:", Data.user._id);
-  
+      console.log("data after successfull login", Data)
+
       if (response.ok) {
         const sortName = Data.user.FirstName[0] + Data.user.LastName[0];
         setIsUserAlreadyExist(true);
         setUserShortName(sortName.toUpperCase());
         setUserId(Data.user._id);
-  
-        // Retrieve existing user details from localStorage or initialize an empty array
-        const localUserDetail = JSON.parse(localStorage.getItem("UserDetail")) || [];
-  
-        // Check if the user already exists in localStorage
-        const userExists = localUserDetail.some((user) => user.Email === Username);
-  
-        if (!userExists) {
-          // If the user does not exist, add them to localStorage
+        setCartItems(Data.user.Cart || []);
+        localStorage.setItem("userShortName", JSON.stringify(sortName));
+        localStorage.setItem("UserDetail", JSON.stringify(Data.user));
+        localStorage.setItem("cartItems", JSON.stringify(Data.user.Cart || []));
+
+        const localUserDetail =
+          JSON.parse(localStorage.getItem("UserDetail")) || [];
+        if (!localUserDetail.some((user) => user.Email === Username)) {
           const updatedUserDetails = [...localUserDetail, { ...Data.user }];
           localStorage.setItem("UserDetail", JSON.stringify(updatedUserDetails));
-          console.log("User detail added to localStorage.");
-        } else {
-          console.log("User detail already exists in localStorage.");
         }
       } else {
         throw new Error(Data.message || "Unable to match user credentials.");
@@ -152,92 +169,107 @@ const ShopContextProvider = (props) => {
       console.error("Error while matching the user credentials:", error.message);
     }
   };
-  
-  
-  useEffect(() => {
-    setCartItems(getDefaultCart(all_product));
-  }, [all_product]);
-
 
   const handleProductSize = (id, sizeValue) => {
-  setProductSize((prev) => ({
-    ...prev,
-    [id]: sizeValue, // Replace the current size with the new size for the product
-  }));
-  alert("Size updated!");
-};
-
-
-const addToCart = async (UserId, ProductId, productSize, Quantity) => {
-  if (!userInfo || !userInfo._id) {
-    alert("Please log in to add items to the cart.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:3000/user/addtocart?UserId=${UserId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        UserId,
-        ProductId,
-        Size: productSize.id,
-        Quantity,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to add item to cart: ${response.status}`);
-    }
-
-    const data = await response.json();
-    setCartItems((prev) => ({
-      ...prev,
-      [ProductId]: (prev[ProductId] || 0) + Quantity,
-    }));
-    alert("Item added to cart!");
-  } catch (error) {
-    console.error("Error while adding item to cart:", error.message);
-  }
-};
-
-
-const increaseQuantity = async (UserId, ProductId, productSize) => {
-  addToCart(UserId, ProductId, productSize, 1); // Increment quantity by 1
-};
-
-const decreaseQuantity = async (UserId, ProductId, productSize) => {
-  setCartItems((prev) => ({
-    ...prev,
-    [ProductId]: Math.max((prev[ProductId] || 1) - 1, 0),
-  }));
-
-  // Optionally, make an API call to update the backend
-};
-
-
-  const removeFromCart = (itemId) => {
-    setCartItems((prev) => ({
-      ...prev,
-      [itemId]: Math.max((prev[itemId] || 0) - 1, 0),
-    }));
-  };
-
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const productId in cartItems) {
-      const quantity = cartItems[productId];
-      if (quantity > 0) {
-        const product = all_product.find((item) => item.id === Number(productId));
-        if (product) {
-          totalAmount += product.new_price * quantity;
+    setProductSize((prev) => {
+      const updatedSizes = Object.keys(prev).reduce((acc, key) => {
+        if (key !== id.toString()) {
+          acc[key] = "";
+        } else {
+          acc[key] = prev[key];
         }
-      }
-    }
-    return totalAmount;
+        return acc;
+      }, {});
+
+      return {
+        ...updatedSizes,
+        [id]: sizeValue,
+      };
+    });
+    alert("Size updated!");
   };
+
+  const addToCart = async (UserId, ProductId, productSize, Quantity) => {
+    if (!isUserAlreadyExist) {
+      alert("Please log in to add items to the cart.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/user/addtocart?UserId=${UserId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ProductId,
+            Size: productSize,
+            Quantity,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to add item to cart: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setCartItems(data.Cart);
+      localStorage.setItem("cartItems", JSON.stringify(data.Cart));
+      alert("Item added to cart!");
+    } catch (error) {
+      console.error("Error while adding item to cart:", error.message);
+    }
+  };
+
+  const increaseQuantity = async (UserId, ProductId, productSize) => {
+    addToCart(UserId, ProductId, productSize, 1);
+  };
+
+  const decreaseQuantity = async (UserId, ProductId, productSize) => {
+    setCartItems((prev) => ({
+      ...prev,
+      [ProductId]: Math.max((prev[ProductId] || 1) - 1, 0),
+    }));
+  };
+
+  const removeFromCart = async (UserId, ProductId, Size) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/user/removefromcart?UserId=${UserId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ProductId,
+            Size,
+          }),
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setCartItems(data.Cart);
+        localStorage.setItem("cartItems", JSON.stringify(data.Cart));
+      }
+    } catch (error) {
+      console.error("Error while removing item from cart:", error.message);
+    }
+  };
+
+  const getTotalAmount = () => {
+    return cartItems.reduce((total, cartItem) => {
+      const product = fetchAllProduct.find(p => p._id === cartItem.ProductId); // Match product by ID
+      if (product) {
+        return total + (product.Offer_Price * cartItem.Quantity); // Calculate total for each item
+      }
+      return total; // Return the total if product is not found
+    }, 0);
+  };
+  
 
   const getTotalCartItem = () => {
     return Object.values(cartItems).reduce((total, count) => total + count, 0);
@@ -247,7 +279,7 @@ const decreaseQuantity = async (UserId, ProductId, productSize) => {
     setWishlistStatus((prev) => !prev);
     if (!wishlistItems.includes(itemid)) {
       setWishlistItems((prev) => [...prev, itemid]);
-      alert("Item added in the wishlist");
+      alert("Item added to the wishlist");
     } else {
       setWishlistItems((prev) => prev.filter((item) => item !== itemid));
       alert("Item removed from the wishlist");
@@ -256,7 +288,7 @@ const decreaseQuantity = async (UserId, ProductId, productSize) => {
 
   const contextValue = {
     getTotalCartItem,
-    getTotalCartAmount,
+    getTotalAmount,
     all_product,
     cartItems,
     addToCart,
@@ -285,7 +317,10 @@ const decreaseQuantity = async (UserId, ProductId, productSize) => {
     isUserAlreadyExist,
     setIsUserAlreadyExist,
     userShortName,
-    userInfo
+    userInfo,
+    UserId,
+    Quantity,
+    fetchAllProduct,
   };
 
   return (
