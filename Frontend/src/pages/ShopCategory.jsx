@@ -7,11 +7,18 @@ import Item from "../components/Item/Item";
 function ShopCategory(props) {
   const { fetchData, all_product, allBrandName, allProductColor, allDiscount } =
     useContext(ShopContext);
+  console.log("all product data :-",all_product)
 
   const [filters, setFilters] = useState({
     brands: [],
     colors: [],
     discounts: [],
+  });
+
+  const [expandedFilters, setExpandedFilters] = useState({
+    brands: false,
+    colors: false,
+    discounts: false,
   });
 
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -69,6 +76,14 @@ function ShopCategory(props) {
     });
   };
 
+  // Toggle expanded state for filters
+  const toggleExpand = (filterType) => {
+    setExpandedFilters((prev) => ({
+      ...prev,
+      [filterType]: !prev[filterType],
+    }));
+  };
+
   if (loading) {
     return <div className="loader">Loading products...</div>;
   }
@@ -80,55 +95,78 @@ function ShopCategory(props) {
         <h3>Filter by</h3>
         <div>
           <h4>Brands</h4>
-          {allBrandName.map((brand, index) => (
-            <label key={index}>
-              <input
-                type="checkbox"
-                value={brand}
-                checked={filters.brands.includes(brand)} // Ensure checkbox reflects current state
-                onChange={(e) =>
-                  handleFilterChange("brands", brand, e.target.checked)
-                }
-              />
-              {brand}
-            </label>
-          ))}
+          {allBrandName
+            .slice(0, expandedFilters.brands ? allBrandName.length : 4)
+            .map((brand, index) => (
+              <label key={index}>
+                <input
+                  type="checkbox"
+                  value={brand}
+                  checked={filters.brands.includes(brand)} // Ensure checkbox reflects current state
+                  onChange={(e) =>
+                    handleFilterChange("brands", brand, e.target.checked)
+                  }
+                />
+                {brand}
+              </label>
+            ))}
+          {allBrandName.length > 4 && (
+            <button onClick={() => toggleExpand("brands")}>
+              {expandedFilters.brands ? "See Less" : "See More"}
+            </button>
+          )}
         </div>
         <div>
           <h4>Colors</h4>
-          {allProductColor.map((color, index) => (
-            <label key={index}>
-              <input
-                type="checkbox"
-                value={color}
-                checked={filters.colors.includes(color)} // Ensure checkbox reflects current state
-                onChange={(e) =>
-                  handleFilterChange("colors", color, e.target.checked)
-                }
-              />
-              {color}
-            </label>
-          ))}
+          {allProductColor
+            .slice(0, expandedFilters.colors ? allProductColor.length : 4)
+            .map((color, index) => (
+              <label key={index}>
+                <input
+                  type="checkbox"
+                  value={color}
+                  checked={filters.colors.includes(color)} // Ensure checkbox reflects current state
+                  onChange={(e) =>
+                    handleFilterChange("colors", color, e.target.checked)
+                  }
+                />
+                {color}
+              </label>
+            ))}
+          {allProductColor.length > 4 && (
+            <button onClick={() => toggleExpand("colors")}>
+              {expandedFilters.colors ? "See Less" : "See More"}
+            </button>
+          )}
         </div>
         <div>
           <h4>Discount</h4>
-          {allDiscount.map((discount, index) => (
-            <label key={index}>
-              <input
-                type="checkbox"
-                value={discount}
-                checked={filters.discounts.includes(`${discount}%`)} // Ensure checkbox reflects current state
-                onChange={(e) =>
-                  handleFilterChange(
-                    "discounts",
-                    `${discount}%`,
-                    e.target.checked
-                  )
-                }
-              />
-              {`${discount}%`}
-            </label>
-          ))}
+          {allDiscount
+            .map((discount) => Math.floor(discount)) // Floor each discount value
+            .filter((discount) => discount > 0) // Keep only values greater than 0
+            .slice(0, expandedFilters.discounts ? allDiscount.length : 4)
+            .map((discount, index) => (
+              <label key={index}>
+                <input
+                  type="checkbox"
+                  value={discount}
+                  checked={filters.discounts.includes(`${discount}%`)} // Ensure checkbox reflects current state
+                  onChange={(e) =>
+                    handleFilterChange(
+                      "discounts",
+                      `${discount}%`,
+                      e.target.checked
+                    )
+                  }
+                />
+                {`  ${discount}% `}
+              </label>
+            ))}
+          {allDiscount.length > 4 && (
+            <button onClick={() => toggleExpand("discounts")}>
+              {expandedFilters.discounts ? "See Less" : "See More"}
+            </button>
+          )}
         </div>
       </div>
 
@@ -153,6 +191,7 @@ function ShopCategory(props) {
               image={item.Image1}
               new_price={item.Offer_Price}
               old_price={item.Price}
+              discount={item.Discount}
             />
           ))}
         </div>

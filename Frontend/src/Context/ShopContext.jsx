@@ -18,7 +18,6 @@ const ShopContextProvider = (props) => {
   const [allProductColor, setAllProductColor] = useState([]);
   const [allDiscount, setAllDiscount] = useState([]);
   const [cartItems, setCartItems] = useState([]);
-  const [UserDetails, setUserDetails] = useState(false);
   const [searchkeyword, setSearchkeyWord] = useState("");
   const [addItemToCArt, setAddItemToCart] = useState(false);
   const [wishlistItems, setWishlistItems] = useState([]);
@@ -32,22 +31,33 @@ const ShopContextProvider = (props) => {
   const [Quantity, setQuantity] = useState(1);
   const [fetchAllProduct, setFetchAllProduct] = useState([]);
 
-  useEffect(() => {
-    const storedUserShortName = JSON.parse(localStorage.getItem("userShortName"));
+  useEffect(async () => {
+    const storedUserShortName = JSON.parse(
+      localStorage.getItem("userShortName")
+    );
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
     const storedUserInfo = JSON.parse(localStorage.getItem("UserDetail"));
+    const storedwishlistitems = JSON.parse(localStorage.getItem("wishlistItems"));
+    
 
+    console.log("userdetail in localstorage", storedUserInfo);
     if (storedUserShortName) {
-      setUserShortName(storedUserShortName);
-      setIsUserAlreadyExist(true);
+       setUserShortName(storedUserShortName);
+       setIsUserAlreadyExist(true);
     }
 
     if (storedCartItems) {
-      setCartItems(storedCartItems);
+       setCartItems(storedCartItems);
     }
 
     if (storedUserInfo) {
-      setUserInfo(storedUserInfo);
+       setUserInfo(storedUserInfo);
+       setIsUserDetailSaved(true);
+      setIsUserAlreadyExist(true);
+      setUserId(storedUserInfo._id)
+    } 
+    if (storedwishlistitems) {
+      setWishlistItems(storedwishlistitems);
     }
 
     allproductfetcher();
@@ -67,12 +77,18 @@ const ShopContextProvider = (props) => {
 
   const fetchData = async (Gender, filters = {}) => {
     try {
-      const queryParams = new URLSearchParams({ Gender, ...filters }).toString();
-      const response = await fetch(`http://localhost:3000/product?${queryParams}`);
+      const queryParams = new URLSearchParams({
+        Gender,
+        ...filters,
+      }).toString();
+      const response = await fetch(
+        `http://localhost:3000/product?${queryParams}`
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch products");
       }
-      const { filterData, allBrandName, allProductColor, allDiscount } = await response.json();
+      const { filterData, allBrandName, allProductColor, allDiscount } =
+        await response.json();
       setall_product(filterData);
       setAllBrandName(allBrandName);
       setAllProductColor(allProductColor);
@@ -144,7 +160,7 @@ const ShopContextProvider = (props) => {
         `http://localhost:3000/user/login?Email=${Username}&Password=${Password}`
       );
       const Data = await response.json();
-      console.log("data after successfull login", Data)
+      console.log("data after successfull login", Data);
 
       if (response.ok) {
         const sortName = Data.user.FirstName[0] + Data.user.LastName[0];
@@ -156,17 +172,24 @@ const ShopContextProvider = (props) => {
         localStorage.setItem("UserDetail", JSON.stringify(Data.user));
         localStorage.setItem("cartItems", JSON.stringify(Data.user.Cart || []));
 
-        const localUserDetail =
-          JSON.parse(localStorage.getItem("UserDetail")) || [];
-        if (!localUserDetail.some((user) => user.Email === Username)) {
-          const updatedUserDetails = [...localUserDetail, { ...Data.user }];
-          localStorage.setItem("UserDetail", JSON.stringify(updatedUserDetails));
-        }
-      } else {
-        throw new Error(Data.message || "Unable to match user credentials.");
+        // const localUserDetail =
+        //   JSON.parse(localStorage.getItem("UserDetail")) || [];
+        // if (!localUserDetail.some((user) => user.Email === Username)) {
+        //   const updatedUserDetails = [...localUserDetail, { ...Data.user }];
+        //   localStorage.setItem(
+        //     "UserDetail",
+        //     JSON.stringify(updatedUserDetails)
+        //   );
+        // }
+      // } else {
+      //   throw new Error(Data.message || "Unable to match user credentials.");
+        // }
       }
     } catch (error) {
-      console.error("Error while matching the user credentials:", error.message);
+      console.error(
+        "Error while matching the user credentials:",
+        error.message
+      );
     }
   };
 
@@ -190,9 +213,8 @@ const ShopContextProvider = (props) => {
   };
 
   const addToCart = async (UserId, ProductId, productSize, Quantity) => {
-    if (!isUserAlreadyExist) {
+    if (!isUserAlreadyExist || !isUserDetailSaved) {
       alert("Please log in to add items to the cart.");
-      return;
     }
 
     try {
@@ -237,6 +259,8 @@ const ShopContextProvider = (props) => {
   };
 
   const removeFromCart = async (UserId, ProductId, Size) => {
+
+    console.log("user id:-",UserId, "Product id :-",ProductId, "Size :-",Size, "inside remove from cart function in shopcontext")
     try {
       const response = await fetch(
         `http://localhost:3000/user/removefromcart?UserId=${UserId}`,
@@ -263,14 +287,13 @@ const ShopContextProvider = (props) => {
 
   const getTotalAmount = () => {
     return cartItems.reduce((total, cartItem) => {
-      const product = fetchAllProduct.find(p => p._id === cartItem.ProductId); // Match product by ID
+      const product = fetchAllProduct.find((p) => p._id === cartItem.ProductId); // Match product by ID
       if (product) {
-        return total + (product.Offer_Price * cartItem.Quantity); // Calculate total for each item
+        return total + product.Offer_Price * cartItem.Quantity; // Calculate total for each item
       }
       return total; // Return the total if product is not found
     }, 0);
   };
-  
 
   const getTotalCartItem = () => {
     return Object.values(cartItems).reduce((total, count) => total + count, 0);
@@ -287,6 +310,37 @@ const ShopContextProvider = (props) => {
     }
   };
 
+  const ManageWishlist = async (UserId, ProductId) => {
+    if (!isUserAlreadyExist || !isUserDetailSaved) {
+      alert("you first need to login");
+      return;
+    } else {
+      try {
+        const response = await fetch(`http://localhost:3000/user/addtowishlist?UserId=${UserId}&ProductId=${ProductId}`,
+         {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          
+          }
+        });
+        const data = await response.json();
+        console.log("data comming from backend for add to wishlist", data);
+        if (response.ok) {
+          setWishlistItems(data.WishlistVal)
+          localStorage.setItem("wishlistItems",JSON.stringify(data.WishlistVal))
+
+        }
+  
+        
+      } catch (error) {
+        console.log("error while adding item to wishlist")
+      }
+    }
+    
+  }
+  console.log("wishlist items  shopcontext:-",wishlistItems)
+
   const contextValue = {
     getTotalCartItem,
     getTotalAmount,
@@ -294,8 +348,8 @@ const ShopContextProvider = (props) => {
     cartItems,
     addToCart,
     removeFromCart,
-    setUserDetails,
-    UserDetails,
+    // setUserDetails,
+    // UserDetails,
     searchkeyword,
     setSearchkeyWord,
     addItemToCArt,
@@ -322,6 +376,7 @@ const ShopContextProvider = (props) => {
     UserId,
     Quantity,
     fetchAllProduct,
+    ManageWishlist 
   };
 
   return (
@@ -332,4 +387,3 @@ const ShopContextProvider = (props) => {
 };
 
 export default ShopContextProvider;
-

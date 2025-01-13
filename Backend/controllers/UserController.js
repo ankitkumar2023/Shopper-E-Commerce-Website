@@ -238,40 +238,44 @@ const updateCartQuantity = async (req, res) => {
   
 
 
-const addToWishlist = async (req, res) => {
+  const addToWishlist = async (req, res) => {
     try {
         const { ProductId, UserId } = req.query;
-        
-        console.log(ProductId, UserId);
+
+        console.log("product id :",ProductId, typeof(ProductId),"User id :- ",UserId, " in the add to wishlist function in backend");
 
         let user = await User.findById(UserId);
-        console.log(user)
-       
-        if (user["Wishlisted"].length == 0) {
-            user["Wishlisted"].push(ProductId)
+        // console.log(user);
+
+        // Check if ProductId is already in the wishlist
+        const isProductInWishlist = user["Wishlisted"].includes(ProductId);
+
+        if (isProductInWishlist) {
+            // If the product is in the wishlist, remove it
+            user["Wishlisted"] = user["Wishlisted"].filter((id) => id != ProductId);
         } else {
-            const result = await user["Wishlisted"].filter((val) => val == ProductId);
-    
-            if (result.length == 0) {
-                user["Wishlisted"].push(ProductId);
-                return res.status(201).json({ message: "Item successfully added to wishlist" })
-            } else {
-                const newval = await user["Wishlisted"].filter((val) => val != ProductId);
-    
-                user["Wishlisted"] = newval;
-                return res.status(201).json({ message: "Item remove from wishlist successfully" })
-            }
+            // If the product is not in the wishlist, add it
+            user["Wishlisted"].push(ProductId);
         }
-        let result = await user.save();
+
+        // Save the updated user data
+        await user.save();
         let WishlistVal = user["Wishlisted"];
-        res.status(201).json({ message: "Item Successfully added to wishlist", WishlistVal, result })
-        
+
+        // Send a single response after updating
+        res.status(201).json({
+            message: isProductInWishlist
+                ? "Item removed from wishlist successfully"
+                : "Item successfully added to wishlist",
+            WishlistVal
+        });
     } catch (error) {
-        console.log("Error while Updating th wishlist", error);
+        console.log("Error while updating the wishlist", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
-   
 };
+
+
 
 const value = { updateUserDetails, signupDetails,userChecker,UserVerification ,DeleteUser,addToCart,addToWishlist,RemoveFromCart,updateCartQuantity};
 export default value;

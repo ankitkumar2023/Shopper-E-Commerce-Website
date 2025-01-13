@@ -28,8 +28,9 @@ const CartItems = () => {
       <div>
         <hr />
         {cartItems.map((cartItem, index) => {
+          console.log("inside cartitem.jsx:-",cartItem)
           const product = fetchAllProduct.find(
-            (p) => p._id == cartItem.ProductId
+            (p) => p._id.trim().toString() == cartItem.ProductId.trim().toString()
           ); // Match product by ID
           console.log("matched products", product);
 

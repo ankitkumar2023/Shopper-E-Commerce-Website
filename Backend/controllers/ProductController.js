@@ -101,13 +101,14 @@ const FilterProducts = async (req, res) => {
           Color: { $first: "$Color" },
           Brand: { $first: "$Brand" },
           Offer_Price: { $first: "$Offer_Price" },
+          Price:{$first:"$Price"},
           Gender: { $first: "$Gender" },
           Discount: { $first: "$Discount" },
           ProductQuantity: { $first: "$ProductQuantity" },
         },
       },
       // Optional: Add a distinct operation after grouping to avoid any duplicates
-      { $project: { _id: 1, Image1: 1, Image2: 1, Category: 1, Color: 1, Brand: 1, Offer_Price: 1, Gender: 1, Discount: 1, ProductQuantity: 1 } }
+      { $project: { _id: 1, Image1: 1, Image2: 1, Category: 1, Color: 1, Brand: 1, Offer_Price: 1,Price:1, Gender: 1, Discount: 1, ProductQuantity: 1 } }
     ]);
 
     // Sort the filtered data if needed

@@ -22,6 +22,6 @@ router.post('/updatecartquantity',updateCartQuantity)
 
 router.post('/removefromcart',RemoveFromCart)
 
-router.put('/addtowishlist',addToWishlist)
+router.post('/addtowishlist',addToWishlist)
 
 export default router;
