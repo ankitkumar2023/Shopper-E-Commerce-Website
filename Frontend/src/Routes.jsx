@@ -32,7 +32,10 @@ const RoutesFile = () => {
           <Route path=":productId" element={<Product />} />
         </Route>
         <Route path="/cart" element={<Cart />} />
-        <Route path="/wishlist" element={<Wishlist/> } />
+
+        <Route path="/wishlist" element={<Wishlist />} >
+          {/* <Route path="/product/:productId" element={<Product/>}/> */}
+        </Route>
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
 

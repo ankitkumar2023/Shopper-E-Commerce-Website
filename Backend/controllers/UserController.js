@@ -172,7 +172,7 @@ const RemoveFromCart = async (req, res) => {
     const { UserId } = req.query;
     const { ProductId, Size } = req.body;
 
-    console.log("UserId :-",UserId,"ProductId :- ",ProductId,"Size :- ",Size)
+    // console.log("UserId :-",UserId,"ProductId :- ",ProductId,"Size :- ",Size)
 
     if (!UserId || !ProductId || !Size ) {
       return res.status(400).json({ message: "Invalid request data" });
@@ -210,7 +210,9 @@ const RemoveFromCart = async (req, res) => {
 const updateCartQuantity = async (req, res) => {
   try {
      const { UserId } = req.query;
-      const {  ProductId, Size, Quantity } = req.body;
+    const { ProductId, Size, Quantity } = req.body;
+    
+    console.log("product id :-",ProductId, typeof(ProductId))
   
       const userDetails = await User.findOne({ _id: UserId });
   
@@ -219,7 +221,7 @@ const updateCartQuantity = async (req, res) => {
       }
   
       const cartItem = userDetails.Cart.find(
-        (item) => item.ProductId.toString()=== ProductId.toString() && item.Size.trim().toLowerCase() === Size.trim().toLowerCase
+        (item) => item.ProductId==ProductId && item.Size.trim().toLowerCase() == Size.trim().toLowerCase()
       );
   
       if (cartItem) {

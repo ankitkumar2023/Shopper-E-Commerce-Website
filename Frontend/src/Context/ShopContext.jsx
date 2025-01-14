@@ -247,6 +247,36 @@ const ShopContextProvider = (props) => {
     }
   };
 
+  const updateCartQuantity = async (UserId, ProductId, Size, Quantity) => {
+    try {
+      const response = await fetch(`http://localhost:3000/user/updatecartquantity?UserId=${UserId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Correct Content-Type
+        },
+        body: JSON.stringify({
+          ProductId: ProductId,
+          Size: Size,
+          Quantity: Quantity,
+        }),
+      });
+  
+      const data = await response.json();
+      console.log(data); // Log API response for debugging
+  
+      if (data.Cart.length > 0) {
+        // Update state with the new cart
+        setCartItems(data.Cart);
+  
+        // Synchronize with local storage
+        localStorage.setItem("cartItems", JSON.stringify(data.Cart));
+      }
+    } catch (error) {
+      console.error("Error while updating the product quantity:", error.message);
+    }
+  };
+  
+
   const increaseQuantity = async (UserId, ProductId, productSize) => {
     addToCart(UserId, ProductId, productSize, 1);
   };
@@ -312,7 +342,7 @@ const ShopContextProvider = (props) => {
 
   const ManageWishlist = async (UserId, ProductId) => {
     if (!isUserAlreadyExist || !isUserDetailSaved) {
-      alert("you first need to login");
+      // alert("you first need to login");
       return;
     } else {
       try {
@@ -376,7 +406,8 @@ const ShopContextProvider = (props) => {
     UserId,
     Quantity,
     fetchAllProduct,
-    ManageWishlist 
+    ManageWishlist,
+    updateCartQuantity
   };
 
   return (

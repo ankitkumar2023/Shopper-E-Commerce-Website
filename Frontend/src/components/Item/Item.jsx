@@ -16,7 +16,7 @@ function Item(props) {
   const handleAddToCart = () => {
     try {
       addToCart(UserId, id, "S", Quantity); // Default size "S" and Quantity
-      alert("Your item was successfully added to the cart!");
+      // alert("Your item was successfully added to the cart!");
     } catch (error) {
       console.error("Failed to add item to cart:", error);
       alert("Failed to add the item. Please try again.");
@@ -45,7 +45,7 @@ function Item(props) {
         <div className="item-price-old">$ {old_price}</div>
         {/* Only show discount if it's greater than 0 */}
         {discount > 0 && (
-          <div className="item-discount">{discount}% off</div>
+          <div className="item-discount">{Math.floor(discount)}% off</div>
         )}
       </div>
       <div className="item-status">

@@ -1,206 +1,215 @@
 /* General Reset */
 body, ul {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.Navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background: linear-gradient(90deg, #7b4eac, #58b5b8);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Logo Section */
+.Nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.Nav-logo img {
+  height: 50px;
+  transition: transform 0.3s ease;
+}
+
+.Nav-logo img:hover {
+  transform: scale(1.1);
+}
+
+.Nav-logo p {
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  color: #f8f8f8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Navigation Menu */
+.menu-div ul {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+.nav-menu li {
+  position: relative;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  color: #ffbc47;
+}
+
+.nav-menu li::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 3px;
+  background: #ffdd57;
+  bottom: -5px;
+  left: 0;
+  transition: width 0.3s ease;
+}
+
+.nav-menu li:hover::after {
+  width: 100%;
+}
+
+.nav-menu li:hover {
+  color: #ffdd57;
+}
+
+/* Search Bar */
+.searchbar-div {
+  display: flex;
+  align-items: center;
+  width: 38%;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transform: scale(1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.searchbar-div:hover {
+  transform: scale(1.05);
+}
+
+.searchbar-input {
+  flex: 1;
+  padding: 10px 15px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #333;
+}
+
+.searchbar-input::placeholder {
+  color: #aaa;
+}
+
+.search-icon-button {
+  background: #c2ccae;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.search-icon-button img {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+}
+
+.search-icon-button:hover {
+  background: #9fc1fb;
+  transform: rotate(15deg);
+}
+
+/* Login and Cart Section */
+.nav-login-cart {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-login-cart button {
+  background: #ffdd57;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.nav-login-cart button:hover {
+  background: #ffbc47;
+  transform: scale(1.1);
+}
+
+.nav-login-cart img {
+  height: 30px;
+  transition: transform 0.3s ease;
+}
+
+.nav-login-cart img:hover {
+  transform: scale(1.2);
+}
+
+/* User Info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.user-info:hover {
+  transform: translateY(-3px);
+}
+
+.user-info img {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .menu-div ul {
+    display: none;
   }
-  
-  .Navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 30px;
-    background: linear-gradient(90deg, #7b4eac, #58b5b8); /* Gradient background */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    color: white;
-    font-family: 'Arial', sans-serif;
+
+  .searchbar-div {
+    width: 100%;
   }
-  
-  .Nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+
+  .nav-login-cart {
+    gap: 10px;
   }
-  
-  .Nav-logo img {
-    height: 40px;
-  }
-  
+
   .Nav-logo p {
     font-size: 20px;
-    font-weight: bold;
-    letter-spacing: 1px;
   }
-  
-  .menu-div ul {
-    display: flex;
-    gap: 20px;
-    list-style: none;
-  }
-  
-  .nav-menu li {
-    position: relative;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: color 0.3s ease;
-    color: #ffbc47;
-  }
-  
-  .nav-menu li:hover {
-    color: #cdb452;
-  }
-  
-  .nav-menu li hr {
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: #ffdd57;
-    border: none;
-  }
-  
-  .searchbar-div {
-    display: flex;
-    align-items: center;
-    width: 38%;
-    /* max-width: 500px; */
-    background-color: white;
-    border-radius: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  .searchbar-input {
-    flex: 1;
-    padding: 10px 15px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    color: #333;
-  }
-  
-  .searchbar-input::placeholder {
-    color: #aaa;
-  }
-  
-  .search-icon-button {
-    background: #c2ccae;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background white 0.3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+}
 
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-
-  .search-icon-button img{
-    background-color: white;
-    height: 30px;
-    width: 30px;
-    color: white;
-    border-radius: 50%;
-    margin-top: 5px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .search-icon-button:hover {
-    background: #9fc1fb;
-  }
-  
-  .search-icon {
-    height: 20px;
-    width: 20px;
-    background-color: white;
-    filter: invert(1); /* Makes the icon white */
-  }
-  
-  .nav-login-cart {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    gap: 15px;
-    width: 20%;
-    /* border: 1px solid red; */
-  }
-  
-  .nav-login-cart button {
-    background: #ffdd57;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .nav-login-cart button:hover {
-    background: #ffbc47;
-  }
-  
-  .nav-login-cart img {
-    height: 30px;
-  }
-  
-  .nav-login-cart-counter {
-    background: #ff6f61;
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-
-  
-
-
-  .nav-menu li {
-    position: relative;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    color: #ffbc47;
-  }
-  
-
-
-  
-
-  
-  .nav-login-cart {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .nav-login-cart button {
-    background: #ffdd57;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-  }
-  
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-   
-  
-  @media (max-width: 768px) {
-    .searchbar-div {
-      width: 100%;
-    }
-  
-    .menu-div ul {
-      display: none;
-    }
-  }
-  
+}

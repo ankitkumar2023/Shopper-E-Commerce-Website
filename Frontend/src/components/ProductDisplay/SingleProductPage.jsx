@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const ProductDisplay = (props) => {
   const { product } = props;
-  const { addToCart, UserId, wishlistItems, handleWishlist, productSize, handleProductSize, Quantity,isUserDetailSaved,isUserAlreadyExist} = useContext(ShopContext);
+  const { addToCart, UserId, wishlistItems, handleWishlist, productSize, handleProductSize, Quantity,isUserDetailSaved,isUserAlreadyExist,ManageWishlist} = useContext(ShopContext);
   const navigate = useNavigate();
 
   const checker = (UserId,ProductId, selectedSize,Quantity,isUserDetailSaved,isUserAlreadyExist) => {
@@ -80,7 +80,7 @@ const ProductDisplay = (props) => {
               <p>Add To Cart</p>
             </div>
           </Link>
-          <div className="wishlist" onClick={() => handleWishlist(product._id)}>
+          <div className="wishlist" onClick={() => { handleWishlist(product._id);ManageWishlist(UserId,product._id) }}>
             <p>Add To Wishlist</p>
             <img
               className="wishlist_icon"

@@ -195,6 +195,32 @@
   display: flex;
   flex-wrap: wrap;
 }
+
+.cartitems-quantity-wrapper {
+  position: relative;
+}
+
+.quantity-dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 60px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.quantity-option {
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.quantity-option:hover {
+  background-color: #f0f0f0;
+}
+
   /* Responsive Design */
   @media (max-width: 768px) {
     .product-details, .cartitems-format {

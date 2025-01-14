@@ -1,15 +1,25 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import "./CartItems.css";
 import { ShopContext } from "../../Context/ShopContext";
 import remove_icon from "../Assets/cart_cross_icon.png";
 
 const CartItems = () => {
-  const { getTotalAmount, fetchAllProduct, cartItems, removeFromCart, UserId } =
+  const { getTotalAmount, fetchAllProduct, cartItems, removeFromCart, UserId, updateCartQuantity } =
     useContext(ShopContext);
+  const [quantityDropdown, setQuantityDropdown] = useState(null); // Tracks which item's quantity dropdown is open
 
-  console.log("all products fetch data in cart page", fetchAllProduct);
-  console.log("i am inside cartItem.jsx");
-  console.log("cartItems", cartItems);
+  const handleQuantityClick = (index) => {
+    // Toggle dropdown visibility for a specific item
+    setQuantityDropdown((prev) => (prev === index ? null : index));
+  };
+
+  const handleQuantityChange = (cartItem, newQuantity) => {
+    console.log("cart item in cart", cartItem)
+    console.log("product id in cart item",cartItem.ProductId)
+    // Update the quantity in the cart
+    updateCartQuantity(UserId, cartItem.ProductId, cartItem.Size, newQuantity);
+    setQuantityDropdown(null); // Close the dropdown
+  };
 
   return (
     <>
@@ -28,74 +38,72 @@ const CartItems = () => {
       <div>
         <hr />
         {cartItems.map((cartItem, index) => {
-          console.log("inside cartitem.jsx:-",cartItem)
           const product = fetchAllProduct.find(
             (p) => p._id.trim().toString() == cartItem.ProductId.trim().toString()
-          ); // Match product by ID
-          console.log("matched products", product);
+          );
 
           if (!product) {
-            console.log("Product not found for cartItem", cartItem); // Log if product not found
-            return null; // Skip if the product is not found
+            return null;
           }
 
           return (
             <div key={index} className="cartitems-format cartitems-format-main">
-              {/* Product Image */}
               <img
                 src={product.Image1}
                 alt={product.Brand}
                 className="carticon-product-icon"
               />
-
-              {/* Product Name */}
               <p className="product-title">{product.Brand}</p>
-
-              {/* Product Price */}
               <p>${product.Offer_Price}</p>
-
-              {/* Quantity */}
-              <p className="cartitems-quantity">{cartItem.Quantity}</p>
-
-              {/* Selected Size */}
+              <div className="cartitems-quantity-wrapper">
+                <p
+                  className="cartitems-quantity"
+                  onClick={() => handleQuantityClick(index)}
+                >
+                  {cartItem.Quantity}
+                </p>
+                {quantityDropdown === index && (
+                  <div className="quantity-dropdown">
+                    {[...Array(10).keys()].map((i) => (
+                      <div
+                        key={i + 1}
+                        className="quantity-option"
+                        onClick={() => handleQuantityChange(cartItem, i + 1)}
+                      >
+                        {i + 1}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               <p>{cartItem.Size}</p>
-
-              {/* Product Total */}
               <p>${product.Offer_Price * cartItem.Quantity}</p>
-
-              {/* Remove Icon */}
               <img
                 className="cartitems-remove-icon"
                 src={remove_icon}
                 onClick={() =>
                   removeFromCart(UserId, cartItem.ProductId, cartItem.Size)
-                } // Pass productId and size to remove
+                }
                 alt="Remove"
               />
             </div>
           );
         })}
 
-        {/* Cart Total Section */}
         <div className="cartitems-down">
           <div className="cartitems-total">
             <h1>Cart Total</h1>
             <div>
-              {/* Subtotal Section */}
               <div className="cartitems-total-item">
                 <p>Subtotal</p>
                 <p>${getTotalAmount()}</p>
               </div>
               <hr />
-
-              {/* Shipping Fee Section */}
               <div className="cartitems-total-item">
                 <p>Shipping Fee</p>
                 <p>Free</p>
               </div>
               <hr />
-
-              {/* Total Section */}
               <div className="cartitems-total-item">
                 <h3>Total</h3>
                 <h3>${getTotalAmount()}</h3>
